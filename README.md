@@ -4,7 +4,7 @@ This repository contains the final materials and implementations for the **Funda
 
 ## 👥 Team Members
 - **Ali Kashipazha** – 40121723  
-- **[Teammate Name]** – 40115563  
+- **Hamidreza Eslami** – 40115563  
 
 ## 📚 Project Overview
 The main project focuses on **Customer Churn Prediction** using machine learning techniques.  
