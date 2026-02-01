@@ -16,7 +16,7 @@ python q1/src/q1.py
 ```
 
 # Terminal Output
-
+```
 Data Preprocessing Completed.
 Dataset Shape after dropping NaNs: (499, 12)
 Training features shape: (349, 11)
@@ -48,3 +48,4 @@ GA         | 0.8200     | 1               | 0.1711
 
 --- Selected Features by GA ---
 ['Credit_History']
+```
