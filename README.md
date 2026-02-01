@@ -4,7 +4,7 @@ This repository contains the final materials and implementations for the **Funda
 
 ## 👥 Team Members
 - **Ali Kashipazha** – 40121723  
-- **Hamidreza Eslami** – 40115563  
+- **HamidReza Eslami** – 40115563  
 
 ## 📚 Project Overview
 The main project focuses on **Customer Churn Prediction** using machine learning techniques.  
@@ -14,7 +14,6 @@ It utilizes the *Telco Customer Churn* dataset and implements a full ML pipeline
 - Result analysis  
 
 The dataset is provided in the repository as:
-
 `project/data/Telco_customer_churn.xlsx`
 
 
@@ -27,5 +26,3 @@ FIS4041_F_40121723_40115563/
 ├── project/    # Main ML project (Telco Churn)
 └── README.md   # This file
 ```
-
-## 📝 Notes
