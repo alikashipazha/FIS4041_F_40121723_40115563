@@ -3,7 +3,7 @@
 This repository contains the final materials and implementations for the **Fundamentals of Intelligent Systems (FIS4041)** course.
 
 ## 👥 Team Members
-- **Ali Kashipazha** – 40121723  
+- **Ali KashiPazha** – 40121723  
 - **HamidReza Eslami** – 40115563  
 
 ## 📚 Project Overview
@@ -26,3 +26,6 @@ FIS4041_F_40121723_40115563/
 ├── project/    # End-to-end ML pipeline (Telco Customer Churn)
 └── README.md   # Repository overview
 ```
+
+## Versioning
+- **v0.1.0** – Initial project structure and environment setup
