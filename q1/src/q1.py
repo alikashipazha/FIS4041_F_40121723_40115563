@@ -13,7 +13,7 @@ warnings.filterwarnings("ignore")
 # --- A) Data Loading and Preprocessing ---
 
 # Load dataset
-df = pd.read_csv(r'q1\\loan_train.csv')
+df = pd.read_csv(r'q1\\data\\loan_train.csv')
 
 # Drop NaNs
 df = df.dropna()

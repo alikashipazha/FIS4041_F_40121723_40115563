@@ -17,7 +17,7 @@ warnings.filterwarnings('ignore')
 print("--- Part A: Preprocessing ---")
 
 # 1. Load Dataset
-df = pd.read_csv(r'q2\\Mall_Customers.csv')
+df = pd.read_csv(r'q2\\data\\Mall_Customers.csv')
 print(f"Dataset Loaded. Shape: {df.shape}")
 
 # 2. Cleaning (Checking for nulls)
