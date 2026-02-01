@@ -15,7 +15,8 @@ It utilizes the *Telco Customer Churn* dataset and implements a full ML pipeline
 
 The dataset is provided in the repository as:
 ```text
-project/data/Telco_customer_churn.xlsx```
+project/data/Telco_customer_churn.xlsx
+```text
 
 ## 📁 Repository Structure
 FIS4041_F_40121723_40115563/
