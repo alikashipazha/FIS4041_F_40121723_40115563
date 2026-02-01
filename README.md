@@ -29,7 +29,3 @@ FIS4041_F_40121723_40115563/
 ```
 
 ## 📝 Notes
-- Environment folder `fisEnv/` is excluded from version control via `.gitignore`.  
-- The focus of this repository is on clear structure, correctness, and completeness for final submission.
-
-
