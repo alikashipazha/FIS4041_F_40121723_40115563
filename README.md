@@ -21,21 +21,11 @@ The dataset is provided in the repository as:
 ## 📁 Repository Structure
 ```text
 FIS4041_F_40121723_40115563/
-
 │
-
 ├── q1/ # Question 1 implementation
-
 ├── q2/ # Question 2 implementation
-
 ├── project/ # Main ML project (Telco Churn)
-
-├── fisEnv/ # Local Python virtual environment (ignored in Git)
-
-├── report.docx # Project report (Word)
-
-├── report.pdf # Project report (PDF)
-
+├── docs # Final evaluation reports
 └── README.md # This file
 ```
 
