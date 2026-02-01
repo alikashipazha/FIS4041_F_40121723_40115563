@@ -43,8 +43,4 @@ FIS4041_F_40121723_40115563/
 - Environment folder `fisEnv/` is excluded from version control via `.gitignore`.  
 - The focus of this repository is on clear structure, correctness, and completeness for final submission.
 
----
-
-✅ *This single README fully documents the repository — no additional README files are needed in subfolders.*
-
 
