@@ -37,7 +37,7 @@ FIS4041_F_40121723_40115563/
 ├── report.pdf # Project report (PDF)
 
 └── README.md # This file
-```markdown
+```
 
 ## 📝 Notes
 - Environment folder `fisEnv/` is excluded from version control via `.gitignore`.  
