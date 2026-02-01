@@ -14,10 +14,12 @@ It utilizes the *Telco Customer Churn* dataset and implements a full ML pipeline
 - Result analysis  
 
 The dataset is provided in the repository as:
+
 `project/data/Telco_customer_churn.xlsx`
 
 
 ## 📁 Repository Structure
+```text
 FIS4041_F_40121723_40115563/
 
 │
@@ -35,6 +37,7 @@ FIS4041_F_40121723_40115563/
 ├── report.pdf # Project report (PDF)
 
 └── README.md # This file
+```markdown
 
 ## 📝 Notes
 - Environment folder `fisEnv/` is excluded from version control via `.gitignore`.  
