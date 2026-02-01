@@ -15,7 +15,7 @@ the implementation of **Question 1**.
 python q1/src/q1.py
 ```
 
-# Terminal Output
+## Terminal Output
 ```
 Data Preprocessing Completed.
 Dataset Shape after dropping NaNs: (499, 12)

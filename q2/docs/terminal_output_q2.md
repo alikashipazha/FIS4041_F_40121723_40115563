@@ -15,7 +15,7 @@ the implementation of **Question 2**.
 python q2/src/q2.py
 ```
 
-# Terminal Output
+## Terminal Output
 ```
 --- Part A: Preprocessing ---
 Dataset Loaded. Shape: (200, 5)
