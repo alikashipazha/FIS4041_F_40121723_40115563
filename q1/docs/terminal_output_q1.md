@@ -52,4 +52,4 @@ GA         | 0.8200     | 1               | 0.1711
 
 ## Model Performance
 
-![Comparison of PSO and GA Convergence (Feature Selection)](../images/Comparison of PSO and GA Convergence (Feature Selection).png)
+![Comparison of PSO and GA Convergence (Feature Selection)](../images/Comparison_of_PSO_and_GA_Convergence_(Feature_Selection).png)
