@@ -14,7 +14,8 @@ the implementation of **Telco customer churn project**.
 ```bash
 python project/src/project.py
 ```
-## Terminal Output and Visualizaions
+
+## Terminal Output
 ```
 --- Step 1: Data Introduction & Loading ---
 Data Loaded Successfully.
@@ -35,9 +36,7 @@ Churn Value
 Name: proportion, dtype: float64
 
 --- Step 2: Data Preprocessing & Effect Analysis ---
-```
-![Visualization of preprocessing effect](../images/Visualization_of_Preprocessing_Effect.png)
-```
+
 --- Step 3: Dimensionality Reduction (PCA) & Cost-Benefit Analysis ---
 Original Features: 30
 Features after PCA (95% Variance): 17
@@ -82,10 +81,13 @@ weighted avg       0.80      0.81      0.80      1409
     accuracy                           0.80      1409
    macro avg       0.75      0.72      0.73      1409
 weighted avg       0.79      0.80      0.80      1409
-```
-![Confusion Matrix and ROC Curve comparison](../images/Confusion_Matrix_and_ROC_Curve_Comparison.png)
-```
 
 Generating Learning Curves for Gradient Boosting (Best Model Analysis)...
 ```
+
+## Visualizations
+![Visualization of preprocessing effect](../images/Visualization_of_Preprocessing_Effect.png)
+
+![Confusion Matrix and ROC Curve comparison](../images/Confusion_Matrix_and_ROC_Curve_Comparison.png)
+
 ![Learning Curve (Gradient Boosting)](../images/Learning_Curve_(Gradient_Boosting).png)
