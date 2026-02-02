@@ -80,4 +80,5 @@ Visualization plot generated.
 
 ## Visualization
 
+### Comparison of Clustering Algorithms on Mall Customers (PCA Space)
 ![Comparison of Clustering Algorithms on Mall Customers (PCA Space)](../images/Comparison_of_Clustering_Algorithms_on_Mall_Customers_(PCA_Space).png)
