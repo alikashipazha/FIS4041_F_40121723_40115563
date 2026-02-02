@@ -20,7 +20,7 @@ The dataset is provided in the repository as:
 ## 📁 Repository Structure
 ```text
 FIS4041_F_40121723_40115563/
-├── docs        # Final report (PDF) and presentation slides (PPTX)
+├── docs/        # Final report (PDF) and presentation slides (PPTX)
 ├── q1/         # Question 1 implementation (Loan Status)
 ├── q2/         # Question 2 implementation (Mall Customer Segmentation)
 ├── project/    # End-to-end ML pipeline (Telco Customer Churn)
