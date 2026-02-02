@@ -52,4 +52,5 @@ GA         | 0.8200     | 1               | 0.1711
 
 ## Visualization
 
+### Comparison of PSO and GA Convergence (Feature Selection)
 ![Comparison of PSO and GA Convergence (Feature Selection)](../images/Comparison_of_PSO_and_GA_Convergence_(Feature_Selection).png)
