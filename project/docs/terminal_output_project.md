@@ -14,7 +14,7 @@ the implementation of **Telco customer churn project**.
 ```bash
 python project/src/project.py
 ```
-## Terminal Output and visualizaions
+## Terminal Output and Visualizaions
 ```
 --- Step 1: Data Introduction & Loading ---
 Data Loaded Successfully.
