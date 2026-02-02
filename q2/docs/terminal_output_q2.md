@@ -78,6 +78,6 @@ Selected Best DBSCAN Params: Eps=0.4, MinPts=10
 Visualization plot generated.
 ```
 
-## Model Performance
+## Visualization
 
 ![Comparison of Clustering Algorithms on Mall Customers (PCA Space)](../images/Comparison_of_Clustering_Algorithms_on_Mall_Customers_(PCA_Space).png)
