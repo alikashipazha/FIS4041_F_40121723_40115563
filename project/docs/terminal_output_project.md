@@ -86,8 +86,12 @@ Generating Learning Curves for Gradient Boosting (Best Model Analysis)...
 ```
 
 ## Visualizations
+
+#### Visualization of preprocessing effect 
 ![Visualization of preprocessing effect](../images/Visualization_of_Preprocessing_Effect.png)
 
+#### Confusion Matrix and ROC Curve comparison
 ![Confusion Matrix and ROC Curve comparison](../images/Confusion_Matrix_and_ROC_Curve_Comparison.png)
 
+#### Learning Curve (Gradient Boosting)
 ![Learning Curve (Gradient Boosting)](../images/Learning_Curve_(Gradient_Boosting).png)
