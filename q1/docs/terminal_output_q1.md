@@ -49,3 +49,7 @@ GA         | 0.8200     | 1               | 0.1711
 --- Selected Features by GA ---
 ['Credit_History']
 ```
+
+## Model Performance
+
+![Comparison of PSO and GA Convergence (Feature Selection)](../images/Comparison of PSO and GA Convergence (Feature Selection).png)
