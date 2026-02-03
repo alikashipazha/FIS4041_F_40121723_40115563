@@ -29,3 +29,4 @@ FIS4041_F_40121723_40115563/
 
 ## Versioning
 - **v0.1.0** – Initial project structure and environment setup
+- **v1.0.0-rc.1** – Implementation complete, documentation in progress
