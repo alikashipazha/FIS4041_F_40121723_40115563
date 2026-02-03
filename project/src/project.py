@@ -237,7 +237,7 @@ for name, model in models.items():
     results[name] = grid.best_score_
     
     print(f"Best Params for {name}: {grid.best_params_}")
-    print(f"Best CV F1-Score: {grid.best_score_:.4f}")
+    print(f"Best CV AUC-Score: {grid.best_score_:.4f}")
 
 # ==========================================
 # 6 & 7. ارزیابی نهایی، تحلیل و مصورسازی (Evaluation & Visualization)
