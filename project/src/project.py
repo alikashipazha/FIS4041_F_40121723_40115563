@@ -223,7 +223,7 @@ class SmartPenaltyEnsemble(BaseEstimator, ClassifierMixin):
         """
         self.rf_model = rf_model
         self.gb_model = gb_model
-        self.t = conflict_threshold
+        self.conflict_threshold = conflict_threshold
         # کپی کردن کلاس‌ها برای سازگاری با توابع Scikit-Learn
         self.classes_ = rf_model.classes_ 
 
@@ -240,12 +240,12 @@ class SmartPenaltyEnsemble(BaseEstimator, ClassifierMixin):
         # 2. شناسایی منطقه اختلاف (Gray Zone)
         # جایی که RF می‌گوید "ریزش" (بالای t) اما GB می‌گوید "امن" (زیر t)
         # t = 0.3
-        conflict_mask = (rf_prob > self.t) & (gb_prob < self.t)
+        conflict_mask = (rf_prob > self.conflict_threshold) & (gb_prob < self.conflict_threshold)
 
         # 3. محاسبه جریمه شناور (Dynamic Penalty)
         # فرمول: Penalty = Threshold - GB_Prob
         # هرچه GB مطمئن‌تر باشد (عددش به 0 نزدیکتر باشد)، جریمه سنگین‌تر است
-        penalty = self.t - gb_prob
+        penalty = self.conflict_threshold - gb_prob
 
         # 4. اعمال منطق نهایی
         final_prob = rf_prob.copy()
@@ -259,7 +259,7 @@ class SmartPenaltyEnsemble(BaseEstimator, ClassifierMixin):
 
     def predict(self, X):
         # تبدیل احتمال به کلاس 0 یا 1 با همان آستانه
-        return (self.predict_proba(X)[:, 1] >= self.t).astype(int)
+        return (self.predict_proba(X)[:, 1] >= self.conflict_threshold).astype(int)
 
 # ---------------------------------------------------------
 # اجرای مدل ترکیبی هوشمند
@@ -346,15 +346,16 @@ plt.grid(alpha=0.3)
 
 plt.tight_layout()
 
-# --- ANALYSIS: Learning Curves (Why Overfitting?) ---
-print("\nGenerating Learning Curves for Gradient Boosting (Best Model Analysis)...")
+# --- ANALYSIS: Learning Curves ---
+print("\n--- Generating Learning Curves for Random Forest and Gradient Boosting Models ---")
 
-def plot_learning_curve(estimator, title, X, y, cv=None, n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5)):
+def plot_learning_curve(estimator, title, X, y, cv=None, n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
     plt.figure(figsize=(8, 5))
     plt.title(title)
     plt.xlabel("Training examples")
     plt.ylabel("Score (F1)")
     
+    # اجرای محاسبه منحنی یادگیری
     train_sizes, train_scores, test_scores = learning_curve(
         estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes, scoring='f1')
     
@@ -371,9 +372,18 @@ def plot_learning_curve(estimator, title, X, y, cv=None, n_jobs=None, train_size
     plt.plot(train_sizes, train_scores_mean, 'o-', color="r", label="Training score")
     plt.plot(train_sizes, test_scores_mean, 'o-', color="g", label="Cross-validation score")
     plt.legend(loc="best")
+    plt.tight_layout()
     plt.show()
 
-# رسم منحنی یادگیری برای مدل GB (معمولاً مدل قوی‌تر است)
-plot_learning_curve(best_estimators['Gradient Boosting (Boosting)'], 
-                    "Learning Curve (Gradient Boosting)", 
-                    X_train, y_train, cv=cv, n_jobs=-1)
+target_models = ['Random Forest (Bagging)', 'Gradient Boosting (Boosting)']
+
+for name in target_models:
+    # چک می‌کنیم اگر مدل در دیکشنری موجود بود اجرا شود
+    if name in best_estimators:
+        model = best_estimators[name]
+        print(f"Generating Learning Curve for: {name} ...")
+        
+        try:
+            plot_learning_curve(model, f"Learning Curve ({name})", X_train, y_train, cv=cv, n_jobs=1)
+        except Exception as e:
+            print(f"Failed to plot for {name}: {e}")

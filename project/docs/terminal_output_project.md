@@ -96,7 +96,9 @@ weighted avg       0.80      0.76      0.77      1409
 weighted avg       0.81      0.74      0.75      1409
 
 
-Generating Learning Curves for Gradient Boosting (Best Model Analysis)...
+--- Generating Learning Curves for Random Forest and Gradient Boosting Models ---
+Generating Learning Curve for: Random Forest (Bagging) ...
+Generating Learning Curve for: Gradient Boosting (Boosting) ...
 ```
 ## Visualizations
 
@@ -107,4 +109,7 @@ Generating Learning Curves for Gradient Boosting (Best Model Analysis)...
 ![Confusion Matrix and ROC Curve comparison](../images/Confusion_Matrix_and_ROC_Curve_Comparison.png)
 
 ### Learning Curve for Gradient Boosting
-![Learning Curve (Gradient Boosting)](../images/Learning_Curve_(Gradient_Boosting).png)
+![Learning Curve (Gradient Boosting(Boosting))](../images/Learning_Curve_(Gradient_Boosting(Boosting)).png)
+
+### Learning Curve for Random Forest
+![Learning Curve (Random Forest(Bagging))](../images/Learning_Curve_(Random_Forest_(Bagging)).png)
