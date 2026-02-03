@@ -11,6 +11,8 @@ from sklearn.decomposition import PCA
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.compose import ColumnTransformer
 from sklearn.metrics import classification_report, confusion_matrix, roc_curve, auc, accuracy_score, f1_score
+from sklearn.ensemble import VotingClassifier
+from sklearn.base import BaseEstimator, ClassifierMixin
 
 # ==========================================
 # GOLBAL CONFIGURATION FOR REPRODUCIBILITY (STEP 6)
@@ -41,10 +43,6 @@ target_col = 'Churn Value'  # فرض بر این است که نام ستون ه�
 print(f"\nTarget Distribution ({target_col}):")
 print(df[target_col].value_counts(normalize=True))
 
-# # بررسی مقادیر گم‌شده
-# print("\nMissing Values per column (Top 5):")
-# print(df.isnull().sum().sort_values(ascending=False).head(5))
-
 # ==========================================
 # 2. پیش‌پردازش داده‌ها (Data Preprocessing)
 # ==========================================
@@ -58,27 +56,15 @@ df['Total Charges'] = pd.to_numeric(df['Total Charges'], errors='coerce')
 # منطق: این‌ها مشتریانی با Tenure Months = 0 هستند که هنوز قبض نگرفته‌اند
 df['Total Charges'] = df['Total Charges'].fillna(0)
 
-# # حذف CustomerID (چون ویژگی پیش‌بینی‌کننده نیست)
-# if 'CustomerID' in df.columns:
-#     df.drop('CustomerID', axis=1, inplace=True)
+# --- Feature Engineering (Engineering Touch) ---
+# ساخت ویژگی نسبت تغییر هزینه: آیا هزینه فعلی نسبت به میانگین کل دوره بیشتر شده؟
+# (اضافه کردن اپسیلون 1e-9 برای جلوگیری از تقسیم بر صفر)
+df['Avg_Monthly_Charges'] = df['Total Charges'] / (df['Tenure Months'] + 1e-9)
+df['Charge_Difference_Ratio'] = (df['Monthly Charges'] - df['Avg_Monthly_Charges']) / (df['Avg_Monthly_Charges'] + 1e-9)
 
-# # پر کردن مقادیر گم‌شده (Imputation)
-# # برای متغیرهای عددی از میانه (Median) استفاده می‌کنیم تا به داده‌های پرت حساس نباشد
-# num_cols = df.select_dtypes(include=['float64', 'int64']).columns
-# cat_cols = df.select_dtypes(include=['object']).columns
-
-# imputer = SimpleImputer(strategy='median')
-# df[num_cols] = imputer.fit_transform(df[num_cols])
-
-# # ب) تبدیل متغیر هدف به 0 و 1
-# df[target_col] = df[target_col].map({'Yes': 1, 'No': 0})
-
-# # ج) تبدیل متغیرهای کتگوریال (One-Hot Encoding)
-# df_encoded = pd.get_dummies(df, drop_first=True)
-
-# # جدا کردن X و y
-# X = df_encoded.drop(target_col, axis=1)
-# y = df_encoded[target_col]
+# این ویژگی‌های جدید رو به لیست عددی اضافه کن تا اسکیل بشن
+# (یادت باشه این خط باید قبل از تعریف preprocessor باشه)
+numerical_cols = ['Tenure Months', 'Monthly Charges', 'Total Charges', 'Avg_Monthly_Charges', 'Charge_Difference_Ratio']
 
 # لیست ستون‌های حذفی (شامل ستون‌های نشتی‌دهنده و اطلاعات مکانی غیرضروری)
 cols_to_drop = [
@@ -94,20 +80,6 @@ df_clean = df.drop(columns=cols_to_drop)
 X = df_clean.drop(columns=['Churn Value'])
 y = df_clean['Churn Value']
 
-# # د) تقسیم داده‌ها (قبل از نرمال‌سازی برای جلوگیری از Data Leakage)
-# # استفاده از stratify برای حفظ نسبت کلاس‌ها در آموزش و تست
-# X_train_raw, X_test_raw, y_train, y_test = train_test_split(
-#     X, y, test_size=0.2, stratify=y, random_state=SEED
-# )
-
-# # هـ) نرمال‌سازی (Standardization) و تحلیل اثر آن
-# scaler = StandardScaler()
-# # فیت کردن فقط روی داده‌های آموزش
-# X_train = scaler.fit_transform(X_train_raw)
-# X_test = scaler.transform(X_test_raw)
-
-# شناسایی ستون‌های عددی و دسته‌ای
-numerical_cols = ['Tenure Months', 'Monthly Charges', 'Total Charges']
 categorical_cols = [col for col in X.columns if col not in numerical_cols]
 
 # تعریف تبدیل‌گر (Transformer)
@@ -119,7 +91,8 @@ preprocessor = ColumnTransformer(
         # drop='first' برای جلوگیری از هم‌خطی (Multicollinearity)
         ('cat', OneHotEncoder(handle_unknown='ignore', drop='first'), categorical_cols)
     ],
-    verbose_feature_names_out=False
+    verbose_feature_names_out=False,
+    sparse_threshold=0
 )
 
 # تقسیم داده‌ها به آموزش و تست (با رعایت نسبت کلاس‌ها)
@@ -239,50 +212,139 @@ for name, model in models.items():
     print(f"Best Params for {name}: {grid.best_params_}")
     print(f"Best CV AUC-Score: {grid.best_score_:.4f}")
 
+print("\n--- Training Hybrid Cascade Ensemble (Custom Logic: RF Hunter + GB Filter) ---")
+
+class SmartPenaltyEnsemble(BaseEstimator, ClassifierMixin):
+    def __init__(self, rf_model, gb_model, conflict_threshold=0.3):
+        """
+        rf_model: مدل جنگل تصادفی (شکارچی)
+        gb_model: مدل گرادیان بوستینگ (محافظه‌کار)
+        conflict_threshold: مرزی که زیر آن GB احساس امنیت می‌کند (t=0.3)
+        """
+        self.rf_model = rf_model
+        self.gb_model = gb_model
+        self.t = conflict_threshold
+        # کپی کردن کلاس‌ها برای سازگاری با توابع Scikit-Learn
+        self.classes_ = rf_model.classes_ 
+
+    def fit(self, X, y):
+        # مدل‌های پایه قبلاً در GridSearchCV آموزش دیده‌اند
+        # نیازی به آموزش مجدد نیست (Transfer Learning)
+        return self
+
+    def predict_proba(self, X):
+        # 1. دریافت احتمالات خام از هر دو مدل
+        rf_prob = self.rf_model.predict_proba(X)[:, 1]
+        gb_prob = self.gb_model.predict_proba(X)[:, 1]
+
+        # 2. شناسایی منطقه اختلاف (Gray Zone)
+        # جایی که RF می‌گوید "ریزش" (بالای t) اما GB می‌گوید "امن" (زیر t)
+        # t = 0.3
+        conflict_mask = (rf_prob > self.t) & (gb_prob < self.t)
+
+        # 3. محاسبه جریمه شناور (Dynamic Penalty)
+        # فرمول: Penalty = Threshold - GB_Prob
+        # هرچه GB مطمئن‌تر باشد (عددش به 0 نزدیکتر باشد)، جریمه سنگین‌تر است
+        penalty = self.t - gb_prob
+
+        # 4. اعمال منطق نهایی
+        final_prob = rf_prob.copy()
+        
+        # فقط در ردیف‌هایی که اختلاف وجود دارد، جریمه را اعمال کن
+        # فرمول: New_RF = RF - (t - GB)
+        final_prob[conflict_mask] = rf_prob[conflict_mask] - penalty[conflict_mask]
+
+        # 5. بازگرداندن فرمت استاندارد Sklearn (دو ستون: احتمال 0 و احتمال 1)
+        return np.vstack((1 - final_prob, final_prob)).T
+
+    def predict(self, X):
+        # تبدیل احتمال به کلاس 0 یا 1 با همان آستانه
+        return (self.predict_proba(X)[:, 1] >= self.t).astype(int)
+
+# ---------------------------------------------------------
+# اجرای مدل ترکیبی هوشمند
+# ---------------------------------------------------------
+
+# ساخت نمونه از کلاس سفارشی با استفاده از بهترین مدل‌های پیدا شده در مراحل قبل
+voting_clf = SmartPenaltyEnsemble(
+    rf_model=best_estimators['Random Forest (Bagging)'],
+    gb_model=best_estimators['Gradient Boosting (Boosting)'],
+    conflict_threshold=0.3  # همان t که توافق کردیم
+)
+
+# فیت کردن (عملاً کاری نمیکند جز آماده‌سازی کلاس، چون مدل‌ها آموزش دیده‌اند)
+voting_clf.fit(X_train, y_train)
+
+# اضافه کردن به لیست مدل‌ها برای رسم نمودار در مرحله بعد
+# نامش را عوض کردم که در نمودار مشخص باشد
+best_estimators['Voting Ensemble'] = voting_clf
+
+# اضافه کردن به دیکشنری مدل‌ها دقیقاً با همان کلید قبلی
+best_estimators['Voting Ensemble'] = voting_clf
+
 # ==========================================
 # 6 & 7. ارزیابی نهایی، تحلیل و مصورسازی (Evaluation & Visualization)
 # ==========================================
 print("\n--- Step 6 & 7: Final Evaluation, Reproducibility & Visualization ---")
 
-plt.figure(figsize=(14, 6))
+# تنظیم ابعاد کلی شکل (یک قاب بزرگ برای ۴ نمودار)
+plt.figure(figsize=(14, 10))
+plt.subplots_adjust(hspace=0.3, wspace=0.3)
 
-# حلقه برای ارزیابی هر دو مدل بهینه شده
-for i, (name, model) in enumerate(best_estimators.items()):
+colors = {
+    'Random Forest (Bagging)': 'blue', 
+    'Gradient Boosting (Boosting)': 'green', 
+    'Voting Ensemble': 'red'
+}
+
+# دیکشنری برای تعیین جایگاه هر ماتریس در شبکه ۲x۲
+# 1: بالا چپ | 2: بالا راست | 3: پایین چپ | 4: پایین راست (برای ROC)
+subplot_map = {
+    'Random Forest (Bagging)': 1,
+    'Gradient Boosting (Boosting)': 2,
+    'Voting Ensemble': 3
+}
+
+for name, model in best_estimators.items():
     
-    # # پیش‌بینی روی داده تست (داده‌هایی که مدل هرگز ندیده است)
-    # y_pred = model.predict(X_test)
-    # y_prob = model.predict_proba(X_test)[:, 1]
+    # 1. تعیین آستانه (Threshold)
+    # برای مدل ترکیبی سخت‌گیری می‌کنیم (0.5) تا Precision بره بالا
+    # برای مدل‌های تکی آسان می‌گیریم (0.35) تا Recall حفظ شه
+    thresh = 0.3 if name == 'Random Forest (Bagging)' else 0.3
     
-    # اصلاح استراتژی ۴: محاسبه احتمالات و اعمال دستی آستانه 0.35
+    # 2. محاسبه احتمالات و پیش‌بینی
     y_prob = model.predict_proba(X_test)[:, 1]
-    y_pred = (y_prob >= 0.35).astype(int)
-
+    y_pred = (y_prob >= thresh).astype(int)
     
-    # گزارش متنی دقیق
-    print(f"\n{'='*20} {name} Evaluation {'='*20}")
+    # 3. گزارش متنی (حتماً چک کن ببین Precision مدل Voting چقدر شد)
+    print(f"\n{'='*20} {name} (Threshold={thresh}) {'='*20}")
     print(classification_report(y_test, y_pred))
     
-    # 1. رسم Confusion Matrix
+    # 4. رسم Confusion Matrix (هر مدل در خانه مخصوص خودش)
+    plt.subplot(2, 2, subplot_map[name])
     cm = confusion_matrix(y_test, y_pred)
-    plt.subplot(1, 2, 1)
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues' if i==0 else 'Greens', alpha=0.6 if i==1 else 1)
-    plt.title('Confusion Matrix Comparison')
-    
-    # 2. رسم ROC Curve
+    sns.heatmap(cm, annot=True, fmt='d', cmap=f'{colors[name].capitalize()}s', cbar=False)
+    plt.title(f'{name}\nThreshold: {thresh}')
+    plt.ylabel('Actual')
+    plt.xlabel('Predicted')
+
+    # 5. رسم ROC Curve (همه روی هم در خانه شماره ۴)
+    plt.subplot(2, 2, 4)
     fpr, tpr, _ = roc_curve(y_test, y_prob)
     roc_auc = auc(fpr, tpr)
     
-    plt.subplot(1, 2, 2)
-    plt.plot(fpr, tpr, label=f'{name} (AUC = {roc_auc:.2f})')
+    plt.plot(fpr, tpr, label=f'{name} (AUC={roc_auc:.2f})', color=colors[name], lw=2)
 
-# تنظیمات نهایی نمودار ROC
-plt.plot([0, 1], [0, 1], 'k--', lw=2)
+# تنظیمات نهایی نمودار ROC (خانه چهارم)
+plt.subplot(2, 2, 4)
+plt.plot([0, 1], [0, 1], 'k--', lw=1) # خط شانس
 plt.xlabel('False Positive Rate')
 plt.ylabel('True Positive Rate')
-plt.title('ROC Curve Comparison')
+plt.title('Combined ROC Curve Comparison')
 plt.legend(loc="lower right")
+plt.grid(alpha=0.3)
+
 plt.tight_layout()
-plt.show()
 
 # --- ANALYSIS: Learning Curves (Why Overfitting?) ---
 print("\nGenerating Learning Curves for Gradient Boosting (Best Model Analysis)...")
