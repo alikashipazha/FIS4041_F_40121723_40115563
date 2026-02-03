@@ -146,7 +146,7 @@ plt.xlabel('Monthly Charges')
 
 plt.subplot(1, 2, 2)
 # پیدا کردن ایندکس ستون Monthly Charges در آرایه نامپای
-mc_idx = list(X.columns).index('Monthly Charges')
+mc_idx = list(feature_names).index('Monthly Charges')
 sns.histplot(X_train[:, mc_idx], kde=True, color='green')
 plt.title('After StandardScaler (Mean=0, Std=1)')
 plt.xlabel('Monthly Charges (Scaled)')
@@ -194,7 +194,7 @@ print("\n--- Step 4 & 5: Model Selection (Bagging vs Boosting) & Hyperparameter 
 
 # تعریف مدل‌ها
 models = {
-    'Random Forest (Bagging)': RandomForestClassifier(random_state=SEED),
+    'Random Forest (Bagging)': RandomForestClassifier(random_state=SEED, class_weight='balanced'),
     'Gradient Boosting (Boosting)': GradientBoostingClassifier(random_state=SEED)
 }
 
@@ -226,7 +226,7 @@ for name, model in models.items():
         estimator=model,
         param_grid=param_grids[name],
         cv=cv,
-        scoring='f1', # تمرکز بر F1 Score به دلیل نامتوازن بودن دیتا
+        scoring='roc_auc', # 'f1', # تمرکز بر F1 Score به دلیل نامتوازن بودن دیتا
         n_jobs=-1,
         verbose=1
     )
@@ -249,9 +249,14 @@ plt.figure(figsize=(14, 6))
 # حلقه برای ارزیابی هر دو مدل بهینه شده
 for i, (name, model) in enumerate(best_estimators.items()):
     
-    # پیش‌بینی روی داده تست (داده‌هایی که مدل هرگز ندیده است)
-    y_pred = model.predict(X_test)
+    # # پیش‌بینی روی داده تست (داده‌هایی که مدل هرگز ندیده است)
+    # y_pred = model.predict(X_test)
+    # y_prob = model.predict_proba(X_test)[:, 1]
+    
+    # اصلاح استراتژی ۴: محاسبه احتمالات و اعمال دستی آستانه 0.35
     y_prob = model.predict_proba(X_test)[:, 1]
+    y_pred = (y_prob >= 0.35).astype(int)
+
     
     # گزارش متنی دقیق
     print(f"\n{'='*20} {name} Evaluation {'='*20}")

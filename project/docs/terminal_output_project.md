@@ -42,45 +42,46 @@ Original Features: 30
 Features after PCA (95% Variance): 17
 
 Running quick comparison: PCA vs. No-PCA (using Random Forest)...
-Method          | Training Time (s)  | Accuracy  
+Method          | Training Time (s)  | Accuracy
 --------------------------------------------------
-Original        | 0.1230             | 0.7956
-With PCA        | 0.1096             | 0.7963
+Original        | 0.1337             | 0.7956
+With PCA        | 0.1198             | 0.7963
 
 --- Step 4 & 5: Model Selection (Bagging vs Boosting) & Hyperparameter Tuning ---
 
 Training Random Forest (Bagging) with GridSearchCV...
 Fitting 5 folds for each of 12 candidates, totalling 60 fits
-Best Params for Random Forest (Bagging): {'max_depth': 10, 'min_samples_split': 5, 'n_estimators': 50}
-Best CV F1-Score: 0.6032
+Best Params for Random Forest (Bagging): {'max_depth': 10, 'min_samples_split': 2, 'n_estimators': 100}
+Best CV F1-Score: 0.8588
 
 Training Gradient Boosting (Boosting) with GridSearchCV...
 Fitting 5 folds for each of 8 candidates, totalling 40 fits
-Best Params for Gradient Boosting (Boosting): {'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 100}
-Best CV F1-Score: 0.5999
+Best Params for Gradient Boosting (Boosting): {'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 50}
+Best CV F1-Score: 0.8632
 
 --- Step 6 & 7: Final Evaluation, Reproducibility & Visualization ---
 
 ==================== Random Forest (Bagging) Evaluation ====================
               precision    recall  f1-score   support
 
-           0       0.85      0.91      0.88      1035
-           1       0.68      0.55      0.61       374
+           0       0.93      0.69      0.79      1035
+           1       0.50      0.87      0.63       374
 
-    accuracy                           0.81      1409
-   macro avg       0.76      0.73      0.74      1409
-weighted avg       0.80      0.81      0.80      1409
+    accuracy                           0.73      1409
+   macro avg       0.72      0.78      0.71      1409
+weighted avg       0.82      0.73      0.75      1409
 
 
 ==================== Gradient Boosting (Boosting) Evaluation ====================
               precision    recall  f1-score   support
 
-           0       0.84      0.90      0.87      1035
-           1       0.66      0.53      0.59       374
+           0       0.88      0.80      0.84      1035
+           1       0.56      0.71      0.62       374
 
-    accuracy                           0.80      1409
-   macro avg       0.75      0.72      0.73      1409
-weighted avg       0.79      0.80      0.80      1409
+    accuracy                           0.77      1409
+   macro avg       0.72      0.75      0.73      1409
+weighted avg       0.80      0.77      0.78      1409
+
 
 Generating Learning Curves for Gradient Boosting (Best Model Analysis)...
 ```
